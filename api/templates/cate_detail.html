@@ -8,6 +8,7 @@
             color: white;
         }
 
+
 </style>
 {% endblock %}
 
@@ -54,12 +55,12 @@
     </div>
 
 
-    <!--只有超级管理员才可以添加接口-->
     <div style="float:right;margin-right:20px;">
         <input type="hidden" value="2" name="aid">
-        <button class="btn btn-success"><a id="new_api" href="{% url " app:new_api" %}">新建接口</a></button>
+        <button class="btn btn-success"><a id="new_api" href="{% url " api:new_api" %}">新建接口</a></button>
         <script>
                 document.getElementById("new_api").href += window.location.search
+
 
         </script>
     </div>
@@ -82,7 +83,7 @@
     <!--顶部导航start-->
     <div class="textshadow"
          style="font-size:16px;widht:100%;height:60px;line-height:60px;padding:0 16px 0 16px;;border-bottom:#ddd 1px solid">
-        <span id="home_id"> <a class="home" href="{% url " app:index" %}">Home</a> - {{ class_name }} </span>
+        <span id="home_id"> <a class="home" href="{% url " api:index" %}">Home</a> - {{ class_name }} </span>
         <span id="topbutton" style="float:right">
                     {% if request.user.is_authenticated %}
                         {#                        欢迎您：{{ request.user.username }}&nbsp;&nbsp;<a
@@ -120,8 +121,7 @@
                         delete
                     </button>&nbsp;
                     <button class="btn btn-info btn-xs "
-                            onclick="editApi('{% url " app:edit_api
-                    " %}', {{ i.id }}, {{ i.aid }})">
+                            onclick="editApi('{% url " api:edit_api" %}', {{ i.id }}, {{ i.aid }})">
                     edit
                     </button>
                     <button class="btn btn-primary btn-xs " onclick="copyApi({{ i.id }})">copy</button>
@@ -161,7 +161,7 @@
                         <td>{{ v.0 }}</td>
                         <td>{{ v.1 }}</td>
                         <td>
-                            <span {% if v.2== "Y" %}style="color:red"{% endif %}>{{ v.2 }}<span>
+                            <span {% if v.2 == "Y" %}style="color:red"{% endif %}>{{ v.2 }}<span>
                         </td>
                         <td>{{ v.3 }}</td>
                         <td>{{ v.4 }}</td>
@@ -199,7 +199,7 @@
 
         <script>
                 //删除某个接口
-                var $url = '{% url "app:del_api" %}';
+                var $url = '{% url "api:del_api" %}';
                 function deleteApi(api_id, div_id) {
                     if (confirm('是否确认删除此接口?')) {
                         $.ajaxSetup({
@@ -226,7 +226,7 @@
                         $.ajaxSetup({
                             data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
                         });
-                        $.post({% url "app:copy_api" %}, {api_id: apiId, api_name: pass}, function (data) {
+                        $.post({% url "api:copy_api" %}, {api_id: apiId, api_name: pass}, function (data) {
                                 if (data == "success") {
                                     window.location.reload();
                                 }
@@ -250,6 +250,7 @@
                         document.getElementById('gotop').style.display = 'none';
                     }
                 };
+
 
         </script>
         <!--接口详情列表与接口管理end-->

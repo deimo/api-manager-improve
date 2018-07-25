@@ -6,10 +6,13 @@ Date: 2018-06-07 15:07:44. Created By jadger.
 """
 import time
 
+from django.urls import reverse
 from django.shortcuts import render, HttpResponse
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-from api.models import Category, Api
+from api.models import Category, Api, Projects
 from django.http import HttpResponseRedirect
+from lib._django import request_get, request_post
 
 
 # Create your views here.
@@ -22,91 +25,73 @@ def page_error(request):
 
 
 def index(request):
-    all_cate = Category.objects.all()
+    """首页显示项目"""
+    items = Projects.objects.all()
     return render(request, 'index.html', locals())
 
 
-def dash_board(request):
-    """
-    工程面板
-    :param request:
-    :return:
-    """
+@login_required
+def category_list(request):
+    pid = request_get(request, 'pid', ptype=int, required=True)
+    p = Projects.objects.get(id=pid)
+    all_cate = Category.objects.filter(project=p).all()
 
-    pass
+    res = dict(all_cate=all_cate)
+    return render(request, 'categories.html', res)
 
 
 @login_required
-def new_class(request):
-    if request.method == 'POST':
-        cname = request.POST['cname']
-        cdesc = request.POST['cdesc']
-        addtime = int(time.time())
-        new_cate = Category.objects.create(cname=cname, cdesc=cdesc, addtime=addtime)
-        new_cate.save()
+@require_POST
+def new_cate(request, pid):
+    p = Projects.objects.get(id=pid)
+    cname = request_post(request, 'cname', required=True)
+    cdesc = request_post(request, 'cdesc', required=True)
+    new_cate = Category.objects.create(project=p, cname=cname, cdesc=cdesc, add_by=request.user)
+    new_cate.save()
+    return HttpResponseRedirect(reverse('api.views.category_list'))
+
+
+@login_required
+@require_POST
+def edit_cate(request, cid):
+    cname = request_post(request, 'cname')
+    cdesc = request_post(request, 'cdesc')
+    c = Category.objects.get(aid=cid)
+    c.cname = cname
+    c.cdesc = cdesc
+    c.save()
+
     return HttpResponseRedirect('/')
 
 
 @login_required
-def edit_class(request):
-    if request.method == 'POST':
-        cname = request.POST['cname']
-        cdesc = request.POST['cdesc']
-        aid = request.POST['aid']
-        try:
-            get_class = Category.objects.get(aid=int(aid))
-            get_class.cname = cname
-            get_class.cdesc = cdesc
-            get_class.save()
-        except Exception as e:
-            print(e)
-            return HttpResponseRedirect('/')
-    return HttpResponseRedirect('/')
+@require_POST
+def del_class(request, cid):
+    get_cate = Category.objects.get(aid=cid)
+    get_cate.isdel = 1
+    get_cate.save()
+    return HttpResponseRedirect(reverse('api.views.category_list'))
 
 
 @login_required
-def del_class(request):
-    if request.method == 'POST':
-        aid = request.POST['aid']
-        get_cate = Category.objects.get(aid=aid)
-        get_cate.isdel = 1
-        get_cate.save()
-    return HttpResponseRedirect('/')
+def api_list(request, cid):
+    cate = Category.objects.get(aid=cid)
+    cname = cate.cname
+    all_api = Api.objects.filter(cate=cate).filter(isdel=0)
 
-
-def get_all_api(request):
-    try:
-        aid = request.GET['aid']
-        assert isinstance(int(aid), int)
-        class_name = Category.objects.get(aid=aid).cname
-    except Exception as e:
-        print(e)
-        print("get_all_api_fail_1")
-    print("get_all_api - aid: {}".format(aid))
-    all_api = Api.objects.filter(aid=aid).filter(isdel=0)
-    return aid, all_api, class_name
-
-
-@login_required
-def class_detail(request):
-    try:
-        aid, all_api, class_name = get_all_api(request)
-    except Exception as e:
-        print(e)
-        return HttpResponseRedirect('/')
     return render(request, 'cate_detail.html', locals())
 
 
 @login_required
+@require_POST
 def copy_api(request):
-    if request.method == "POST":
-        api_id = request.POST["api_id"]
-        api_name = request.POST["api_name"]
-        api_object = Api.objects.get(id=int(api_id))
-        api_object.id = None
-        api_object.name = api_name
-        api_object.save()
-        return HttpResponse("success")
+    api_id = request.POST["api_id"]
+    api_name = request.POST["api_name"]
+    api_object = Api.objects.get(id=int(api_id))
+    api_object.id = None
+    api_object.name = api_name
+    api_object.save()
+    return HttpResponse("success")
 
 
 @login_required
@@ -199,3 +184,35 @@ def new_api(request):
         return HttpResponseRedirect('/class_detail/?aid={}'.format(aid))
 
     return render(request, 'op_api.html', locals())
+
+
+@login_required
+@require_POST
+def new_proj(request):
+    """添加一个项目"""
+    name = request_post(request, 'pname', required=True)
+    desc = request_post(request, 'pdesc', required=True)
+    p = Projects.objects.filter(name=name).first()
+    if not p:
+        p = Projects()
+        p.name = name
+        p.desc = desc
+        p.domain = 'http://' + request.META.get('HTTP_HOST')
+        p.created_by = request.user
+    p.name = name
+    p.desc = desc
+    p.save()
+    return HttpResponseRedirect(reverse('api.index'))
+
+
+@login_required
+@require_POST
+def del_proj(request):
+    """删除一个项目"""
+    pid = request_post(request, 'pid', required=True)
+    ps = Projects.objects.filter(id=pid).all()
+    for p in ps:
+        p.isdel = 1
+        p.save()
+
+    return HttpResponseRedirect(reverse('api.index'))

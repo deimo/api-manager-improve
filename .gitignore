@@ -92,15 +92,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
 
 # mypy
 .mypy_cache/
@@ -108,3 +99,8 @@ venv.bak/
 
 # 数据库的同步脚本
 */migrations/
+
+# 静态文件
+/static/
+# 部署文件
+/deploy/
