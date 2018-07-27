@@ -104,3 +104,8 @@ venv.bak/
 /static/
 # 部署文件
 /deploy/
+
+# 配置文件
+/api_manager/dev_settings.py
+/api_manager/prod_settings.py
+

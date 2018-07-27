@@ -106,59 +106,6 @@ USE_L10N = True
 
 USE_TZ = False
 
-# Logging config
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {  # 过滤器
-#         'require_debug_false': {
-#             '()': 'django.utils.log.RequireDebugFalse',
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose',
-#         },
-#         'mail_admins': {
-#             'level': 'ERROR',
-#             'class': 'django.utils.log.AdminEmailHandler',
-#             'filters': ['require_debug_false'],  # 当且仅当DEBUG=False时 才会发送邮件
-#         },
-#     },
-#     'formatters': {
-#         'verbose': {
-#             'format': '%(levelname)s %(asctime)s >>>>> %(message)s <<<<<'
-#         }
-#     },
-#     'loggers': {
-#         'django.request': {
-#             #'handlers': ['console', 'mail_admins'],
-#             'handlers': ['mail_admins'],
-#             'level': 'ERROR',
-#             'propagate': False,
-#         },
-#         'django': {
-#             'handlers': ['console'],
-#             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
-#             'propagate': True,
-#         },
-#     },
-# }
-
-# Email Sending Config
-SEND_BROKEN_LINK_EMAILS = True  # 非空链接 404报错
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.exmail.qq.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'logger@lvpjob.club'
-EMAIL_HOST_PASSWORD = 'lpLOG233666'
-EMAIL_USE_SSL = True
-EMAIL_SUBJECT_PREFIX = u'【云南司法错误日志】'
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = EMAIL_HOST_USER
-ADMINS = [(u'刘冲', 'liuchong8417@dingtalk.com'), (u'李绍波', 'lishaobo3558@dingtalk.com'),
-          (u'杨明', 'yangming3521@dingtalk.com')]
-MANAGERS = ADMINS
 
 # ignore 404 case
 IGNORABLE_404_URLS = [
