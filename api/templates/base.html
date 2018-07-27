@@ -38,7 +38,7 @@
         {% block api_head %}
         <div style="height:50px;font-size:30px;line-height:50px;">
             <a class="home" style="color:#000000;text-shadow:1px 0px 1px #666;text-decoration: none"
-               href="{% url "api:index" %}">
+               href="{% url "index" %}">
             <span class="glyphicon glyphicon-random" aria-hidden="true" style="width:40px;"></span>&nbsp;
             <span style="position: relative;top:-3px;">API Manager <span
                     style="font-size:12px;position:relative;top:-13px;">&nbsp;v1.0</span></span>
@@ -124,15 +124,14 @@
             $.cookie($COOKIE_KEY, '0');
         }
     }
-    function manage_class(arg, aid, cname, cdesc) {
+    function manage_class(arg, pid, cname, cdesc) {
         name = $(arg).attr("name");
-        if (name == "new_class") {
+        if (name == "new_cate") {
             desc = "添加分类"
             cname = ""
             cdesc = ""
-            aid = ""
         }
-        if (name == "edit_class") {
+        if (name == "edit_cate") {
             desc = "编辑分类"
             cname = cname
             cdesc = cdesc
@@ -149,7 +148,7 @@
             '                        <input type="text" class="form-control" name="cname" placeholder="分类名" value="' + cname + '">' +
             '                    </div>' +
             '                    <div class="form-group">' +
-            '                        <input class="form-control" name="aid" type="hidden" value="' + aid + '">' +
+            '                        <input class="form-control" name="pid" type="hidden" value="' + pid + '">' +
             '                    </div>' +
             '                    <div class="form-group">' +
             '                        <input type="text" class="form-control" name="cdesc" placeholder="描述" value="' + cdesc + '">' +

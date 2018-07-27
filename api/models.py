@@ -47,11 +47,12 @@ class Api(models.Model):
     """
     API详情描述
     """
-    medthods_choices = ((0, 'GET'), (1, 'POST'), (2, 'PUT'), (3, 'DELETE'), (4, 'PATCH'))
+    MEDTHODS_CHOICES = ((0, 'GET'), (1, 'POST'), (2, 'PUT'), (3, 'DELETE'), (4, 'PATCH'))
 
-    id = models.AutoField(primary_key=True, verbose_name="接口编号")
+    id = models.AutoField(primary_key=True)
+    num = models.CharField(verbose_name='接口编号', max_length=200)
     cate = models.ForeignKey(Category, verbose_name='分类', on_delete=models.PROTECT)
-    methods = models.IntegerField(default=0, choices=[], null=False)
+    method = models.IntegerField(default=0, choices=MEDTHODS_CHOICES, null=False)
     name = models.CharField(max_length=100, null=True, verbose_name='接口名')
     url = models.CharField(max_length=255, null=True, verbose_name='请求地址')
     login_required = models.BooleanField(default=False, verbose_name='是否需要登录')

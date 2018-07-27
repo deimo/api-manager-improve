@@ -37,18 +37,19 @@ def category_list(request):
     all_cate = Category.objects.filter(project=p).all()
 
     res = dict(all_cate=all_cate)
+    res['pid'] = pid
     return render(request, 'categories.html', res)
 
 
 @login_required
 @require_POST
-def new_cate(request, pid):
-    p = Projects.objects.get(id=pid)
+def new_cate(request):
+    pid = request_post(request, 'pid', ptype=int, required=True)
     cname = request_post(request, 'cname', required=True)
     cdesc = request_post(request, 'cdesc', required=True)
-    new_cate = Category.objects.create(project=p, cname=cname, cdesc=cdesc, add_by=request.user)
-    new_cate.save()
-    return HttpResponseRedirect(reverse('api.views.category_list'))
+    p = Projects.objects.get(id=pid)
+    Category.objects.create(project=p, cname=cname, cdesc=cdesc, add_by=request.user)
+    return HttpResponseRedirect(reverse('category_list') + '?pid=' + str(pid))
 
 
 @login_required
@@ -61,12 +62,13 @@ def edit_cate(request, cid):
     c.cdesc = cdesc
     c.save()
 
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(reverse('category_list'))
 
 
 @login_required
 @require_POST
-def del_class(request, cid):
+def del_cate(request, cid):
+    cid = request_post(request, 'cid', ptype=int, required=True)
     get_cate = Category.objects.get(aid=cid)
     get_cate.isdel = 1
     get_cate.save()
@@ -74,12 +76,14 @@ def del_class(request, cid):
 
 
 @login_required
-def api_list(request, cid):
-    cate = Category.objects.get(aid=cid)
-    cname = cate.cname
-    all_api = Api.objects.filter(cate=cate).filter(isdel=0)
+def api_list(request):
+    cid = request_get(request, 'cid', ptype=int, required=True)
+    cate = Category.objects.get(id=cid)
+    all_api = Api.objects.filter(cate=cate).filter(isdel=0).all()
+    res = dict(items=all_api)
+    res['cid'] = cid
 
-    return render(request, 'cate_detail.html', locals())
+    return render(request, 'cate_detail.html', res)
 
 
 @login_required
@@ -95,16 +99,17 @@ def copy_api(request):
 
 
 @login_required
+@require_POST
 def del_api(request):
-    if request.method == "POST":
-        api_id = request.POST["api_id"]
-        api_object = Api.objects.get(id=int(api_id))
-        api_object.isdel = 1
-        api_object.save()
-        return HttpResponse("success")
+    api_id = request.POST["api_id"]
+    api_object = Api.objects.get(id=int(api_id))
+    api_object.isdel = 1
+    api_object.save()
+
+    return HttpResponse("success")
 
 
-def get_create_update_arg(request):
+def _get_create_update_arg(request, created=None):
     parameter = {}
     for i in request.POST:
         if i.startswith("param_"):
@@ -121,69 +126,62 @@ def get_create_update_arg(request):
                 tmp = {}
             tmp[int(f1)] = request.POST[i].strip()
             parameter[int(f2)] = tmp
-        else:
-            continue
-            # print tmp
-            # print parameter
-
-    print("parameter: {}".format(parameter))
-
     kw = {
         "num": request.POST['num'].strip(),
         "url": request.POST['url'].strip(),
         "name": request.POST['name'].strip(),
-        "des": request.POST['des'].strip(),
+        "desc": request.POST['desc'].strip(),
+        'login_required': True if request.POST['login'].strip() == '1' else False,
         "parameter": parameter,
         "memo": request.POST['memo'].strip(),
-        "re": request.POST['re'].strip(),
-        "type": request.POST['type'].strip(),
-        "firstuid": request.user.id,
-        "lastuid": request.user.id,
-        "lasttime": int(time.time()),
+        "return_value": request.POST['return_value'].strip(),
+        "method": request.POST['method'].strip(),
     }
+    if created:
+        kw['created_user'] = request.user
+    kw['updated_by'] = request.user.id
+
     return kw
 
 
 @login_required
 def edit_api(request):
-    try:
-        aid, all_api, class_name = get_all_api(request)
-    except Exception as e:
-        print(e)
-        print("new_api_fail_1")
-        return HttpResponseRedirect('/class_detail/?aid={}'.format(aid))
-    try:
-        api_id = request.GET["id"]
-    except Exception as e:
-        print(e)
-        return HttpResponseRedirect('/class_detail/?aid={}'.format(aid))
+    cid = request_get(request, 'cid', ptype=int, required=True)
+    api_id = request_get(request, 'id', ptype=int, required=True)
+
+    cate = Category.objects.get(id=cid)
+    cname = cate.cname
+    all_api = Api.objects.filter(cate=cate).filter(isdel=0).all()
+
     if request.method == "POST":
-        kw = get_create_update_arg(request)
-        kw['aid'] = aid
-        del kw['firstuid']
+        kw = _get_create_update_arg(request)
+        cate = Category.objects.filter(id=cid).first()
+        kw['cate'] = cate
         Api.objects.filter(id=api_id).update(**kw)
-        return HttpResponseRedirect('/class_detail/?aid={}'.format(aid))
-    edit_api_object = Api.objects.get(id=int(api_id))
+        return HttpResponseRedirect(reverse('api_list') + '?cid=' + str(cid))
+    edit_api_object = Api.objects.get(id=api_id)
+    print('the edit_api_object: ', edit_api_object)
+    print('edit_api_object: ', edit_api_object.desc)
     return render(request, 'op_api.html', locals())
 
 
 @login_required
 def new_api(request):
-    try:
-        aid, all_api, class_name = get_all_api(request)
-    except Exception as e:
-        print(e)
-        print("new_api_fail_1")
-        return HttpResponseRedirect('/')
+    cid = request_get(request, 'cid', ptype=int)
+    if request.method == 'GET':
+        cate = Category.objects.filter(id=cid).first()
+        all_api = Api.objects.filter(cate=cate).filter(isdel=0).all()
 
-    if request.method == "POST":
-        kw = get_create_update_arg(request)
-        kw['aid'] = aid
+        return render(request, 'op_api.html', locals())
+
+    if request.method == 'POST':
+        kw = _get_create_update_arg(request, created=True)
+        cate = Category.objects.filter(id=cid).first()
+        kw['cate'] = cate
         api_objects = Api.objects.create(**kw)
         api_objects.save()
-        return HttpResponseRedirect('/class_detail/?aid={}'.format(aid))
 
-    return render(request, 'op_api.html', locals())
+        return HttpResponseRedirect(reverse('api_list') + '?cid=' + str(cid))
 
 
 @login_required
@@ -202,7 +200,7 @@ def new_proj(request):
     p.name = name
     p.desc = desc
     p.save()
-    return HttpResponseRedirect(reverse('api.index'))
+    return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
@@ -215,4 +213,4 @@ def del_proj(request):
         p.isdel = 1
         p.save()
 
-    return HttpResponseRedirect(reverse('api.index'))
+    return HttpResponseRedirect(reverse('index'))

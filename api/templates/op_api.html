@@ -44,6 +44,7 @@
                     <div style="margin-left:20px;">
                         <form action="" method="post">
                             {% csrf_token %}
+                            <input type="text" name="cid", hidden value="{{ cid }}">
                             <h5>基本信息</h5>
                             <div class="form-group has-error">
                                 <div class="input-group">
@@ -64,33 +65,29 @@
                             </div>
                             <div class="form-group has-error">
                                 <div class="input-group">
+                                    <div class="input-group-addon" style="border-right-width: 1px; border-right-style: solid">是否需要登录</div>
+                                    <input type="radio" style="margin-left: 15px;" name="login" value="1" {% if edit_api_object and edit_api_object.login_required == True %} checked {% endif %}>Y
+                                    <input type="radio" name="login" value="0" {% if edit_api_object and edit_api_object.login_required == Flase %} checked {% endif %}>N
+
+                                </div>
+                            </div>
+                            <div class="form-group has-error">
+                                <div class="input-group">
                                     <div class="input-group-addon">请求地址</div>
-                                    <input
-                                            {% if edit_api_object %} value={{ edit_api_object.url }} {% else %} {% endif %}
-                                    type="text" class="form-control" name="url" placeholder="请求地址"
-                                                required="required">
+                                    <input {% if edit_api_object %} value={{ edit_api_object.url }} {% else %} {% endif %} type="text" class="form-control" name="url" placeholder="请求地址" required="required">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <textarea name="des" class="form-control" placeholder="描述">
-                                    {% if edit_api_object %} {{ edit_api_object.des }} {% else %} {% endif %}
-                                </textarea>
+
+                                <textarea name="desc" class="form-control" placeholder="描述">{% if edit_api_object %}{{ edit_api_object.desc }}{% endif %}</textarea>
                             </div>
                             <div class="form-group" required="required">
-                                <select class="form-control" name="type">
-                                    {% if edit_api_object %}
-                                        {% if edit_api_object.type == "POST" %}
-                                            <option selected="selected" value="POST">POST</option>
-                                            <option value="GET">GET</option>
-                                        {% else %}
-                                            <option value="POST">POST</option>
-                                            <option selected="selected" value="GET">GET</option>
-                                        {% endif %}
-                                    {% else %}
-                                        <option value="GET">GET</option>
-                                        <option value="POST">POST</option>
-                                    {% endif %}
-
+                                <select class="form-control" name="method">
+                                    <option value="0"{% if edit_api_object and edit_api_object.method == 0 %} selected {% endif %}>GET</option>
+                                    <option value="1"{% if edit_api_object and edit_api_object.method == 1 %} selected {% endif %}>POST</option>
+                                    <option value="2"{% if edit_api_object and edit_api_object.method == 2 %} selected {% endif %}>PUT</option>
+                                    <option value="3"{% if edit_api_object and edit_api_object.method == 3 %} selected {% endif %}>DELETE</option>
+                                    <option value="4"{% if edit_api_object and edit_api_object.method == 3 %} selected {% endif %}>PATCH</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -190,11 +187,11 @@
                             </div>
                             <div class="form-group">
                                 <h5>返回结果</h5>
-                                <textarea name="re" rows="3" class="form-control" placeholder="返回结果">{% if edit_api_object %}{{ edit_api_object.re }}{% else %}{% endif %}</textarea>
+                                <textarea name="return_value" rows="3" class="form-control" placeholder="返回结果">{% if edit_api_object %}{{ edit_api_object.re }}{% endif %}</textarea>
                             </div>
                             <div class="form-group">
                                 <h5>备注</h5>
-                                <textarea name="memo" rows="3" class="form-control" placeholder="备注">{% if edit_api_object %}{{ edit_api_object.memo }}{% else %}{% endif %}</textarea>
+                                <textarea name="memo" rows="3" class="form-control" placeholder="备注">{% if edit_api_object %}{{ edit_api_object.memo }}{% endif %}</textarea>
                             </div>
                             <button class="btn btn-success">Submit</button>
                         </form>
@@ -232,10 +229,10 @@
                 '</td>' +
                 '</tr >';
             $('#parameter').append($html);
-        }
+        };
         function del(obj) {
             $(obj).parents('tr').remove();
-        }
+        };
     </script>
     <!--添加接口 end-->
 
