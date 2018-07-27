@@ -62,6 +62,7 @@
 4. 使用supervisor管理uwsgi进程
     supervisor的配置文件参考**template.supervisor.conf**
 
+5. 建立log目录，根据需要touch出相应的日志文件
 
 ## 应用截图
 
