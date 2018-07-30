@@ -2,7 +2,14 @@
 
 一个使用django生成的简单的API管理工具，可以方便编写API文档，感谢原作者提供的代码，原作者项目所在[地址](https://github.com/tangguoying2018/api_manager)
 
-我在原作者的基础上新增了python3支持和windows支持，部署方案由gunicorn改为uwsgi
+和原作者相比增加了以下特性
+1. 支持python3+
+2. django2.0+
+3. 可以在windows上开发并预览（使用了pymysql数据库驱动连接）
+4. 修复了textarea无法随文字高度变化的bug
+5. 简化参数处理，自定义中间件，自定义异常
+6. 修改了部分模型
+
 
 ## 要求
 1. python3 required
@@ -75,6 +82,8 @@
 ![新建分类](screenshots/4.jpg)
 
 ![新建接口](screenshots/5.jpg)
+
+![接口预览](screenshots/6.jpg)
 
 
 ## LICENSE

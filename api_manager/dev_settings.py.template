@@ -1,0 +1,27 @@
+"""
+Brief Desc: 开发配置文件模板
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Date: 2018-06-07 15:07:44. Created By jadger.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
+from api_manager.base_settings import *
+
+ALLOWED_HOSTS = []
+
+DATABASES = {
+
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', 
+        'OPTIONS': {
+            'init_command': 'SET default_storage_engine=INNODB',
+            'charset': 'utf8mb4',
+        },
+        'NAME': 'api_manager',  # Or path to database file if using sqlite3.
+        'USER': 'root',  # Not used with sqlite3.
+        'PASSWORD': 'root',  # Not used with sqlite3.
+        'HOST': 'localhost',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',  # Set to empty string for default. Not used with sqlite3.
+    },
+}
+
