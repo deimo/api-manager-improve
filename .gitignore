@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+.DS_Store
 # C extensions
 *.so
 
@@ -108,4 +109,3 @@ venv.bak/
 # 配置文件
 /api_manager/dev_settings.py
 /api_manager/prod_settings.py
-
