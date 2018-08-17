@@ -88,7 +88,7 @@
     <div style="padding:16px;">
         <!--接口详情列表与接口管理start-->
         {% for item in items %}
-            {% with ret=i.id|gen_md5 %}
+            {% with ret=item.id|gen_md5 %}
                 <!--接口详细列表start-->
                 <div class="info_api" style="border:1px solid #ddd;margin-bottom:20px;" id="info_api_{{ ret }}">
                     <div style="background:#f5f5f5;padding:20px;position:relative">
