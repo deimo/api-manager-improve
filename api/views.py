@@ -131,7 +131,7 @@ def _get_create_update_arg(request, created=None):
         "url": request.POST['url'].strip(),
         "name": request.POST['name'].strip(),
         "desc": request.POST['desc'].strip(),
-        'login_required': True if request.POST['login'].strip() == '1' else False,
+        'login_required': True if request.POST.get('login', '').strip() == '1' else False,
         "parameter": parameter,
         "memo": request.POST['memo'].strip(),
         "return_value": request.POST['return_value'].strip(),
